@@ -192,7 +192,7 @@ class WhisperTradesEndpoints(object):
             :type return: json
             """
 
-            if variable_name == '' or new_value == '':
+            if report_number == '':
                 raise ValueError(f"Insufficient information supplied to run report! (REQUIRED) report_number: {report_number}")
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, report_number,'run'))
             payload={}
@@ -250,3 +250,4 @@ class WhisperTradesEndpoints(object):
             payload = json.dumps({"name": variable_name, "value": new_value})
             response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
+        
