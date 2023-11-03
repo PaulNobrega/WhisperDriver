@@ -8,12 +8,19 @@
 ########################################################################################################################
 import json
 import warnings
+import schedule
+from datetime import datetime
+import time
+from threading import Thread
 
 class WhisperTradesBots(object):
 
     def __init__(self, endpts):
         self._endpts = endpts
         self.bots_list = self.__bot_list(self._endpts)
+        self.scheduler_is_on = True
+        self.__scheduler = Thread(target=self.__schedule_loop)
+        self.__scheduler.start()
 
     def __call__(self, bot_number):
         for bot in self.bots_list.all:
@@ -22,6 +29,49 @@ class WhisperTradesBots(object):
         warnings.warn(f"Bot Number: {bot_number} not found!")
         return
     
+    def __del__(self):
+        self.stop_scheduler()
+        return
+
+    def __schedule_loop(self):
+        while self.scheduler_is_on:
+            schedule.run_pending()
+            time.sleep(1)
+        return
+    
+    def start_scheduler(self):
+        """
+        Start Scheduler loop in unique thread.  Thread automatically started at instantiation
+        """
+        if self.scheduler_is_on == False:
+            self.scheduler_is_on = True
+            self.__scheduler.start()
+        return 
+    
+    def stop_scheduler(self):
+        """
+        Stop Scheduler loop thread.
+        """
+        if self.scheduler_is_on == True:
+            schedule.clear()
+            self.scheduler_is_on = False
+        return
+    
+    def stop_scheduler_at_time(self, time_str: str=None, tz_str: str='America/New_York'):
+        """
+        Stop Scheduler thread at predefined time.
+        
+        :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
+        :type time_str: String
+        :param tz_str: human readable TimeZone. Default is 'America/New_York'
+        :type tz_str: String
+        """
+        if not time_str:
+            raise ValueError('Time input string is required!')
+        if 'pm' in time_str.lower() or 'am' in time_str.lower():
+            time_str = datetime.strptime(time_str, '%I:%M %p').strftime('%H:%M')
+        schedule.every().day.at(time_str, tz_str).do(self.stop_scheduler)
+
     def get_all_bot_variables(self) -> json:
         """
         Query WhisperTrades.com for all bot variables and associate data with related bot object
@@ -121,6 +171,8 @@ class WhisperTradesBots(object):
                 self.variables = []
                 self._endpts = endpts
                 self.__bot_dict_to_attr(bot_dict)
+                self.enable = self._change_status('enable', self.number, self._endpts)
+                self.disable = self._change_status('disable', self.number, self._endpts)
            
             def __str__(self):
                 attrs = vars(self)
@@ -151,31 +203,41 @@ class WhisperTradesBots(object):
                 self.variables = [self._endpts.variables.get_bot_variables(v) for v in all_var]
                 return self.variables
             
-            def set_bot_variables(self, variable_number:str='', variable_name:str='', new_value:str=''):
-                """
-                Update bot variable at WhisperTrades.com
+            class _change_status(object):
 
-                REQUIRED
-                :param variable_number: number of variable to update
-                :type variable_number: String
-                :param variable_name: name of variable to update
-                :type variable_name: String
-                :param new_value: new value to set
-                :type new_value: String
-                """
-                params = [variable_number, variable_name, new_value]
-                if '' in params:
-                    warnings.warn('Insufficient data to set bot variables! variable_number, variable_name, and new_value are all required')
+                def __init__(self, target_status, bot_number, endpts):
+                    self._endpts = endpts
+                    self._target_status = target_status
+                    self._bot_number = bot_number
+
+                def __call__(self):
+                    return self._toggle_status()
+                
+                def _toggle_status(self):
+                    if self._target_status == 'enable':
+                        return self._endpts.bots.enable_bot(self._bot_number)
+                    elif self._target_status == 'disable':
+                        return self._endpts.bots.disable_bot(self._bot_number)
                     return
-                for var in self.variables:
-                    if var['number'] == variable_number:
-                        self._endpts.variables.set_bot_variables(variable_number, variable_name=variable_name, new_value=new_value)
-                        return
-                warnings.warn('Variable number does not exist!')
-                return
+                
+                def _meridian_time_to_military_time(self, time_str):
+                    return datetime.strptime(time_str, '%I:%M %p').strftime('%H:%M')
 
-
-
+                def at_time(self, time_str=None, tz_str='America/New_York'):
+                    """
+                    Schedule bot status change.
+                    
+                    :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
+                    :type time_str: String
+                    :param tz_str: human readable TimeZone. Default is 'America/New_York'
+                    :type tz_str: String
+                    """
+                    if not time_str:
+                        raise ValueError('Time input string is required!')
+                    if 'pm' in time_str.lower() or 'am' in time_str.lower():
+                        time_str = self._meridian_time_to_military_time(time_str)
+                    schedule.every().day.at(time_str, tz_str).do(self._toggle_status)
+                    
 
 
 
