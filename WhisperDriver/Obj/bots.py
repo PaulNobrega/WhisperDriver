@@ -8,19 +8,14 @@
 ########################################################################################################################
 import json
 import warnings
-import schedule
 from datetime import datetime
-import time
-from threading import Thread
 
 class WhisperTradesBots(object):
 
-    def __init__(self, endpts):
-        self._endpts = endpts
-        self.bots_list = self.__bot_list(self._endpts)
-        self.scheduler_is_on = True
-        self.__scheduler = Thread(target=self.__schedule_loop)
-        self.__scheduler.start()
+    def __init__(self, scheduler):
+        self._scheduler = scheduler
+        self._endpts = self._scheduler._endpts
+        self.bots_list = self.__bot_list(self._scheduler)
 
     def __call__(self, bot_number):
         for bot in self.bots_list.all:
@@ -28,50 +23,7 @@ class WhisperTradesBots(object):
                 return bot
         warnings.warn(f"Bot Number: {bot_number} not found!")
         return
-    
-    def __del__(self):
-        self.stop_scheduler()
-        return
-
-    def __schedule_loop(self):
-        while self.scheduler_is_on:
-            schedule.run_pending()
-            time.sleep(1)
-        return
-    
-    def start_scheduler(self):
-        """
-        Start Scheduler loop in unique thread.  Thread automatically started at instantiation
-        """
-        if self.scheduler_is_on == False:
-            self.scheduler_is_on = True
-            self.__scheduler.start()
-        return 
-    
-    def stop_scheduler(self):
-        """
-        Stop Scheduler loop thread.
-        """
-        if self.scheduler_is_on == True:
-            schedule.clear()
-            self.scheduler_is_on = False
-        return
-    
-    def stop_scheduler_at_time(self, time_str: str=None, tz_str: str='America/New_York'):
-        """
-        Stop Scheduler thread at predefined time.
-        
-        :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
-        :type time_str: String
-        :param tz_str: human readable TimeZone. Default is 'America/New_York'
-        :type tz_str: String
-        """
-        if not time_str:
-            raise ValueError('Time input string is required!')
-        if 'pm' in time_str.lower() or 'am' in time_str.lower():
-            time_str = datetime.strptime(time_str, '%I:%M %p').strftime('%H:%M')
-        schedule.every().day.at(time_str, tz_str).do(self.stop_scheduler)
-
+       
     def get_all_bot_variables(self) -> json:
         """
         Query WhisperTrades.com for all bot variables and associate data with related bot object
@@ -96,9 +48,10 @@ class WhisperTradesBots(object):
         return
 
     class __bot_list(object):
-        def __init__(self, endpts):
+        def __init__(self, scheduler):
             self.all = []
-            self._endpts = endpts
+            self._scheduler = scheduler
+            self._endpts = self._scheduler._endpts
         
         def all(self) -> list:
             """
@@ -135,7 +88,7 @@ class WhisperTradesBots(object):
                 return
             bot_json = json.loads(json.dumps(bot_dict))
             self.remove_bot_from_list(bot_json['number'])
-            self.all.append(self.bot_obj(bot_json, self._endpts))
+            self.all.append(self.bot_obj(bot_json, self._scheduler))
             return
         
         def remove_bot_from_list(self, bot_number:str):
@@ -151,7 +104,7 @@ class WhisperTradesBots(object):
 
         class bot_obj(object):
             
-            def __init__(self, bot_dict, endpts):
+            def __init__(self, bot_dict, scheduler):
                 self.number = ''
                 self.name = ''
                 self.broker_connection = {}
@@ -169,10 +122,11 @@ class WhisperTradesBots(object):
                 self.adjustments = []
                 self.notifications = []
                 self.variables = []
-                self._endpts = endpts
+                self._scheduler = scheduler
+                self._endpts = self._scheduler._endpts
                 self.__bot_dict_to_attr(bot_dict)
-                self.enable = self._change_status('enable', self.number, self._endpts)
-                self.disable = self._change_status('disable', self.number, self._endpts)
+                self.enable = self._change_status('enable', self.number, self._endpts, self._scheduler)
+                self.disable = self._change_status('disable', self.number, self._endpts, self._scheduler)
            
             def __str__(self):
                 attrs = vars(self)
@@ -205,8 +159,9 @@ class WhisperTradesBots(object):
             
             class _change_status(object):
 
-                def __init__(self, target_status, bot_number, endpts):
+                def __init__(self, target_status, bot_number, endpts, scheduler):
                     self._endpts = endpts
+                    self._scheduler = scheduler
                     self._target_status = target_status
                     self._bot_number = bot_number
 
@@ -232,11 +187,14 @@ class WhisperTradesBots(object):
                     :param tz_str: human readable TimeZone. Default is 'America/New_York'
                     :type tz_str: String
                     """
-                    if not time_str:
+                    if not time_str or not isinstance(time_str, str):
                         raise ValueError('Time input string is required!')
                     if 'pm' in time_str.lower() or 'am' in time_str.lower():
                         time_str = self._meridian_time_to_military_time(time_str)
-                    schedule.every().day.at(time_str, tz_str).do(self._toggle_status)
+                    if not self._scheduler.scheduler_is_on:
+                        self._scheduler.start()
+                    self._scheduler.add_task(time_str, tz_str, self._toggle_status)
+                    return
                     
 
 

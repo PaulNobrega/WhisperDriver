@@ -7,20 +7,29 @@
 ########################################################################################################################
 ########################################################################################################################
 from . import Obj
+import time
 
 class ApiWrapper(object):
 
     def __init__(self, token):
-        self.endpts = Obj.WhisperTradesEndpoints(token)
-        self.bots = Obj.WhisperTradesBots(self.endpts)
+        self.throttle = Obj.WhisperTradesThrottle()
+        self.throttle.disable()
+        self.endpts = Obj.WhisperTradesEndpoints(token, self.throttle)
+        self.scheduler= Obj.WhisperTradesScheduler(self.endpts)
+        self.bots = Obj.WhisperTradesBots(self.scheduler)
         self.variables = Obj.WhisperTradesVariables(self.endpts)
         self.bot_number_list = []
         self.report_number_list = []
         self.variable_number_list = []
         self.__populate()
+        self.throttle.enable()
 
     def __del__(self):
-        del self.bots
+        '''
+        Do not destroy object until scheduler thread completes
+        '''
+        while self.scheduler.scheduler_is_on:
+            time.sleep(1)
         return
 
     def __populate(self):
@@ -49,5 +58,30 @@ class ApiWrapper(object):
         Update list of variable numbers via call to WhisperTrades API
         """
         self.variable_number_list = [i['number'] for i in self.endpts.variables.get_all_bot_variables()]
-
+    
+    def start_scheduler(self):
+        """
+        Start Scheduler loop in unique thread.  Thread automatically started at instantiation
+        """
+        self.scheduler.start()
+        return 
+    
+    def stop_scheduler(self):
+        """
+        Stop Scheduler loop thread.
+        """
+        self.scheduler.stop()
+        return
+    
+    def stop_scheduler_at_time(self, time_str: str=None, tz_str: str='America/New_York'):
+        """
+        Stop Scheduler thread at predefined time.
+        
+        :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
+        :type time_str: String
+        :param tz_str: human readable TimeZone. Default is 'America/New_York'
+        :type tz_str: String
+        """
+        self.scheduler.stop_scheduler_at_time(time_str, tz_str)
+        return
 

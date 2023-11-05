@@ -11,25 +11,16 @@ from urllib.parse import urljoin
 import posixpath
 import json
 import warnings
-import time
 
 
 class WhisperTradesEndpoints(object):
 
-    def __init__(self, token):
+    def __init__(self, token, throttle):
+        self.throttle = throttle
         self.config = self.__config(token)
-        self.bots = self.__bots(self.config)
-        self.reports = self.__reports(self.config)     
-        self.variables = self.__variables(self.config)
-
-    @staticmethod
-    def throttle(fxn):
-        """
-        Whispertrades API rate limit is 30 requests per minute.  This function sleeps for 2 seconds in order to not exceed that limit
-        """
-        time.sleep(2)
-        return fxn()
-
+        self.bots = self.__bots(self.config, self.throttle)
+        self.reports = self.__reports(self.config, self.throttle)     
+        self.variables = self.__variables(self.config, self.throttle)
 
     @staticmethod
     def format_response(response):
@@ -51,9 +42,10 @@ class WhisperTradesEndpoints(object):
             self.HEADERS = {'Accept': 'application/json', 'Content-Type': 'application/json', 'authorization': f'Bearer {self.TOKEN}'}
     
     class __bots(object):    
-        def __init__(self, config):
+        def __init__(self, config, throttle):
             self.endpt = r'bots/'
             self.config = config
+            self._throttle = throttle
 
         def get_bot(self, bot_number: str='', status_filter: list=['Enabled', 'Disabled', 'Disable on Close'], include_details: bool=True) -> json:
             """
@@ -72,7 +64,7 @@ class WhisperTradesEndpoints(object):
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, bot_number))
             payload={}
             params = {'include_details':include_details, 'statuses[]': status_filter}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("GET", url_path, params=params, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("GET", url_path, params=params, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
         
         def get_all_bots(self) -> json:
@@ -96,7 +88,7 @@ class WhisperTradesEndpoints(object):
             """
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, bot_number,'enable'))
             payload={}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
 
         def disable_bot(self, bot_number:str) -> json:
@@ -111,14 +103,15 @@ class WhisperTradesEndpoints(object):
             """
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, bot_number,'disable'))
             payload={}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response) 
 
     class __reports(object):
         
-        def __init__(self, config):
+        def __init__(self, config, throttle):
             self.endpt = r'bots/reports/'
             self.config = config
+            self._throttle = throttle
         
         def get_bot_report(self, report_number: str='') -> json:
             """
@@ -132,7 +125,7 @@ class WhisperTradesEndpoints(object):
             """
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, report_number))
             payload={}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("GET", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("GET", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
         
         def get_all_bot_reports(self) -> json:
@@ -177,7 +170,7 @@ class WhisperTradesEndpoints(object):
                 if payload[key] == '':
                     del payload[key]
 
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=json.dumps(payload)))
+            response = self._throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=json.dumps(payload)))
             return WhisperTradesEndpoints.format_response(response)
         
         def run_bot_report(self, report_number:str=''):
@@ -196,14 +189,15 @@ class WhisperTradesEndpoints(object):
                 raise ValueError(f"Insufficient information supplied to run report! (REQUIRED) report_number: {report_number}")
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, report_number,'run'))
             payload={}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
     
     class __variables(object):
         
-        def __init__(self, config):
+        def __init__(self, config, throttle):
             self.endpt = r'bots/variables/'
             self.config = config
+            self._throttle = throttle
         
         def get_bot_variables(self, variable_number:str='') -> json:
             """
@@ -217,7 +211,7 @@ class WhisperTradesEndpoints(object):
             """
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, variable_number))
             payload={}
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("GET", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("GET", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
         
         def get_all_bot_variables(self) -> json:
@@ -248,6 +242,6 @@ class WhisperTradesEndpoints(object):
                 raise ValueError(f"Insufficient information supplied to set bot variable! (REQUIRED) variable_number: {variable_number}, (REQUIRED) variable_name: {variable_name}, (REQUIRED) new_value: {new_value}")
             url_path = urljoin(self.config.SERVER, posixpath.join(self.endpt, variable_number))
             payload = json.dumps({"name": variable_name, "value": new_value})
-            response = WhisperTradesEndpoints.throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
+            response = self._throttle(lambda: requests.request("PUT", url_path, headers=self.config.HEADERS, data=payload))
             return WhisperTradesEndpoints.format_response(response)
         
