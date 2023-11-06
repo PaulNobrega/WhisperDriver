@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # The scheduler uses the local system time and accepts meredian time or military time as a string
     WD.scheduler.start() # This is optional as adding tasks will automatically start the scheduler
     WD.scheduler.stop_scheduler_at_time('4:30 PM', 'America/New_York') # This will automatically stop the scheduler at a defined time so the thread will close and your code will not hang on the background thread
-    WD.bots(first_bot).enable.at_time('9:00 PM', 'America/New_York') # example using defined meredian time and timezone
+    WD.bots(first_bot).enable.at_time('9:00 AM', 'America/New_York') # example using defined meredian time and timezone
     WD.bots(first_bot).disable.at_time('16:21') # example using defined military time and default timezone = 'America/New_York'
     WD.scheduler.stop() # If you don't schedule a stop, you will want to explicitly stop the schedule thread.  This will cancel all pending tasks
 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
     WD.bots.update_all_bots() # pull all bot data via API request
     enabled_bots = WD.bots.bots_list.is_enabled() # get list of all enabled bots
     _ = [WD.bots(bot.number).disable() for bot in enabled_bots] # disable all enabled bots
-    _ = [WD.bots(first_bot).enable.at_time(WD.bots(bot).entry_condition['earliest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot enable at earliest time of day
-    _ = [WD.bots(first_bot).disable.at_time(WD.bots(bot).entry_condition['latest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot disable on close  at latest time of day
+    _ = [WD.bots(bot.number).enable.at_time(WD.bots(bot).entry_condition['earliest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot enable at earliest time of day
+    _ = [WD.bots(bot.number).disable.at_time(WD.bots(bot).entry_condition['latest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot disable on close  at latest time of day
 
     # WhisperDriver can hit all WhisperTrades endpoints documented as of 11/05/2023 via the endpoints object
     report_number = 'report_number'
