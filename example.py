@@ -45,8 +45,8 @@ if __name__ == '__main__':
     WD.bots.update_all_bots() # pull all bot data via API request
     enabled_bots = WD.bots.bots_list.is_enabled() # get list of all enabled bots
     _ = [WD.bots(bot.number).disable() for bot in enabled_bots] # disable all enabled bots
-    _ = [WD.bots(bot.number).enable.at_time(WD.bots(bot).entry_condition['earliest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot enable at earliest time of day
-    _ = [WD.bots(bot.number).disable.at_time(WD.bots(bot).entry_condition['latest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot disable on close  at latest time of day
+    _ = [WD.bots(bot.number).enable.at_time(WD.bots(bot.number).entry_condition['earliest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot enable at earliest time of day
+    _ = [WD.bots(bot.number).disable.at_time(WD.bots(bot.number).entry_condition['latest_time_of_day'], 'America/New_York') for bot in WD.bot_number_list] # Schedule bot disable on close  at latest time of day
 
     # WhisperDriver can hit all WhisperTrades endpoints documented as of 11/05/2023 via the endpoints object
     report_number = 'report_number'
