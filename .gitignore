@@ -6,3 +6,13 @@ build/
 .env
 .DS_Store
 .vscode/
+
+# Local conda environment
+.conda/
+
+# Packaging and manifest
+MANIFEST.in
+
+# Log and optimization files
+*.log
+*.pyo

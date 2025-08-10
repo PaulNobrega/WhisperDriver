@@ -1,6 +1,6 @@
 # WhisperDriver Library
 
-WhisperDriver is a comprehensive Python library for automating and managing WhisperTrades.com bots, variables, and broker connections. It combines robust API access with advanced Selenium-based web automation, enabling features not available through the API alone. The library is designed for both novice and advanced users, with a focus on reliability, scheduling, and rate-limit safety.
+WhisperDriver is a comprehensive Python library for automating and managing [WhisperTrades.com](https://whispertrades.com/) bots, variables, and broker connections. It combines robust API access with advanced Selenium-based web automation, enabling features not available through the API alone. The library is designed for both novice and advanced users, with a focus on reliability, scheduling, and rate-limit safety.
 
 ## Features
 - **API and Web Automation**: Use the official WhisperTrades API for fast, reliable access, and Selenium automation for advanced features (e.g., UI-only settings, Schwab broker renewal).
@@ -13,11 +13,16 @@ WhisperDriver is a comprehensive Python library for automating and managing Whis
 ## Installation
 
 ```bash
+pip install WhisperDriver==0.1.0
+```
+
+Or, to install all development dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
 ## Authentication & Credentials
-- **API Token**: Obtain from your WhisperTrades.com account. Required for all API-based functions.
+- **API Token**: Obtain from your [WhisperTrades.com](https://whispertrades.com/) account. Required for all API-based functions.
 - **WhisperTrades Username/Password**: Required for Selenium-based web automation (e.g., UI-only features).
 - **Schwab Username/Password**: Required for automatic Schwab broker renewal.
 
