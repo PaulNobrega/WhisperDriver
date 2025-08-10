@@ -66,14 +66,12 @@ WD.scheduler.stop_scheduler_at_time('4:30 PM', 'America/New_York')
 - **`WD.variables.update_variable(var_name, value)`**: Update a variable.
 
 ### Throttle
-- **`WD.throttle.set_limit(calls_per_minute)`**: Set API call rate limit.
-- **`WD.throttle.set_delay(seconds)`**: Set the minimum delay (in seconds) between API requests.
-- **`WD.throttle.enable()` / `WD.throttle.disable()`**: Enable or disable the throttle.
-- **`WD.throttle.get_status()`**: Get current throttle status (enabled/disabled, current delay).
+ **`WD.throttle.set_delay_sec(seconds)`**: Set the minimum delay (in seconds) between API requests. (Default is 2 seconds)
+ **`WD.throttle.enable()` / `WD.throttle.disable()`**: Enable or disable the throttle.
 
 #### Example: Throttle Usage
 ```python
-# Set a 2-second delay between API requests
+WD.throttle.set_delay_sec(2)
 WD.throttle.set_delay(2)
 # Disable throttle if you want maximum speed (not recommended for production)
 WD.throttle.disable()
