@@ -22,16 +22,24 @@ def run_main():
     # Get all bots
     bots = WD.bots.get_all_bots()
 
-    # Schedule enable and soft disable for each bot based on its unique entry time
+    # Schedule enable and soft disable for each bot based on its unique entry window
     today = datetime.datetime.now().date()
     for bot in bots:
-        entry_time_str = bot.get('entry_time')
         bot_num = bot.get('number')
-        if not entry_time_str or not bot_num:
+        entry_cond = bot.get('entry_condition', {})
+        earliest = entry_cond.get('earliest_time_of_day')
+        latest = entry_cond.get('latest_time_of_day')
+        if not earliest or not latest or not bot_num:
+            print(f"{bot_num} has no earliest/latest entry time defined, skipping scheduling.  {bot}")
             continue
-        entry_dt = datetime.datetime.strptime(f"{today} {entry_time_str}", "%Y-%m-%d %I:%M %p")
-        enable_time = (entry_dt - timedelta(minutes=5)).strftime("%I:%M %p")
-        disable_time = (entry_dt + timedelta(minutes=5)).strftime("%I:%M %p")
+        try:
+            earliest_dt = datetime.datetime.strptime(f"{today} {earliest}", "%Y-%m-%d %I:%M %p")
+            latest_dt = datetime.datetime.strptime(f"{today} {latest}", "%Y-%m-%d %I:%M %p")
+        except Exception as e:
+            print(f"Could not parse entry times for bot {bot_num}: {e}")
+            continue
+        enable_time = (earliest_dt - timedelta(minutes=5)).strftime("%I:%M %p")
+        disable_time = (latest_dt + timedelta(minutes=5)).strftime("%I:%M %p")
         # Schedule enable for this bot
         WD.scheduler.add_task(enable_time, 'America/New_York', fxn=partial(WD.bots.enable_bot, bot_num))
         print(f"Scheduled enable for bot {bot_num} at {enable_time}")

@@ -8,7 +8,8 @@ from WhisperDriver.Obj.throttle import WhisperTradesThrottle
 # Global WD instance and enable via_selenium
 WD = WhisperDriver.ApiWrapper(personal.WT_API_TOKEN)
 WD.via_selenium.enable(personal.USER, personal.PWD, is_verbose=True, is_headless=True)
-active_bots = ['bot_num', 'bot_num_2']
+#active_bots = ['bot_num', 'bot_num_2']
+active_bots = ['WFNVC6MY4G']
 
 
 
@@ -126,22 +127,24 @@ def test_apiwrapper_info_methods():
     else:
         print("No bots found in bot_number_list.")
 
-def test_schedule_enable_disable_for_active_bots():
+def test_schedule_enable_disable_for_all_bots():
     """
-    For all active bots, schedule enable 5 minutes before earliest entry time and soft disable 5 minutes after latest entry time via Selenium, if bot is valid.
+    For all bots, schedule enable 5 minutes before earliest entry time and soft disable 5 minutes after latest entry time via Selenium, if bot is valid.
     """
     WD.update_all_bots_list()
     scheduled = []
-    for bot_num in active_bots:
-        if bot_num not in WD.bot_number_list:
-            print(f"Skipping invalid bot: {bot_num}")
-            continue
+    for bot_num in WD.bot_number_list:
         try:
             entry_settings = WD.via_selenium.get_entry_settings(bot_num)
-            # Parse entry times
-            entry_time_start = entry_settings.get('entry_time_start')
-            entry_time_end = entry_settings.get('entry_time_end')
-            if not entry_time_start or not entry_time_end:
+            # Use earliest/latest time from entry_settings (or entry_condition)
+            earliest = entry_settings.get('earliest_entry_time')
+            latest = entry_settings.get('latest_entry_time')
+            if not earliest or not latest:
+                # Try nested under entry_condition
+                entry_cond = entry_settings.get('entry_condition', {})
+                earliest = entry_cond.get('earliest_time_of_day')
+                latest = entry_cond.get('latest_time_of_day')
+            if not earliest or not latest:
                 print(f"{bot_num} has no earliest/latest entry time defined, skipping scheduling.")
                 continue
             # Parse times (assume format 'HH:MM' or 'HH:MM AM/PM')
@@ -153,10 +156,10 @@ def test_schedule_enable_disable_for_active_bots():
                         return datetime.datetime.strptime(tstr, '%H:%M').time()
                     except Exception:
                         return None
-            start_time = parse_time(entry_time_start)
-            end_time = parse_time(entry_time_end)
+            start_time = parse_time(earliest)
+            end_time = parse_time(latest)
             if start_time is None or end_time is None:
-                print(f"Bot {bot_num} has invalid entry time format ('{entry_time_start}', '{entry_time_end}'), skipping.")
+                print(f"Bot {bot_num} has invalid entry time format ('{earliest}', '{latest}'), skipping.")
                 continue
             # Schedule enable/disable (here, just print the intended schedule)
             try:
@@ -170,51 +173,6 @@ def test_schedule_enable_disable_for_active_bots():
             WD.via_selenium.enable_by_bot_num(bot_num)
             # In real scheduling, you'd use a scheduler like APScheduler or cron; here, just call directly for demo
             WD.via_selenium.disable_on_close_by_bot_num(bot_num)
-            scheduled.append(bot_num)
-        except Exception as e:
-            print(f"Error scheduling bot {bot_num}: {e}")
-    print(f"Scheduled {len(scheduled)} bots for enable/disable.")
-
-def test_schedule_enable_disable_for_active_bots_v2():
-    """
-    For all active bots, schedule enable 5 minutes before earliest entry time and soft disable 5 minutes after latest entry time via WD.bots(b).enable/disable.at_time(...), if bot is valid.
-    """
-    WD.update_all_bots_list()
-    scheduled = []
-    for bot_num in active_bots:
-        if bot_num not in WD.bot_number_list:
-            print(f"Skipping invalid bot: {bot_num}")
-            continue
-        try:
-            entry_settings = WD.via_selenium.get_entry_settings(bot_num)
-            entry_time_start = entry_settings.get('entry_time_start')
-            entry_time_end = entry_settings.get('entry_time_end')
-            if not entry_time_start or not entry_time_end:
-                print(f"{bot_num} has no earliest/latest entry time defined, skipping scheduling.")
-                continue
-            def parse_time(tstr):
-                try:
-                    return datetime.datetime.strptime(tstr, '%I:%M %p').time()
-                except Exception:
-                    try:
-                        return datetime.datetime.strptime(tstr, '%H:%M').time()
-                    except Exception:
-                        return None
-            start_time = parse_time(entry_time_start)
-            end_time = parse_time(entry_time_end)
-            if start_time is None or end_time is None:
-                print(f"Bot {bot_num} has invalid entry time format ('{entry_time_start}', '{entry_time_end}'), skipping.")
-                continue
-            try:
-                enable_time = (datetime.datetime.combine(datetime.date.today(), start_time) - datetime.timedelta(minutes=5)).strftime('%I:%M %p')
-                disable_time = (datetime.datetime.combine(datetime.date.today(), end_time) + datetime.timedelta(minutes=5)).strftime('%I:%M %p')
-            except Exception as e:
-                print(f"Bot {bot_num} time math error: {e}, skipping.")
-                continue
-            # Schedule using the same syntax as in WT_auto_on_off_bot.py
-            _ = WD.bots(bot_num).enable.at_time(enable_time, 'America/New_York')
-            _ = WD.bots(bot_num).disable.at_time(disable_time, 'America/New_York')
-            print(f"Scheduled bot {bot_num}: enable at {enable_time}, soft disable at {disable_time}")
             scheduled.append(bot_num)
         except Exception as e:
             print(f"Error scheduling bot {bot_num}: {e}")
@@ -249,6 +207,8 @@ def test_renew_schwab_connection():
 # Entry Point
 if __name__ == "__main__":
     test_apiwrapper_info_methods()
-    test_schedule_enable_disable_for_active_bots_v2()
+    test_schedule_enable_disable_for_all_bots()
     test_scheduler_add_task_with_partial_fxn()
     test_renew_schwab_connection()
+    WD.stop_scheduler()
+    del WD

@@ -2,10 +2,7 @@ import os
 
 def get_hour_minute_ampm_format():
     """
-    Returns the strftime format string for hour:minute AM/PM without leading zero on hour, OS-agnostic.
-    Windows: '%#I:%M %p', Unix: '%-I:%M %p'
+    Returns the strftime/strptime format string for hour:minute AM/PM (cross-platform, always valid for strptime).
+    Use '%I:%M %p' for parsing times with strptime.
     """
-    if os.name == 'nt':
-        return '%#I:%M %p'
-    else:
-        return '%-I:%M %p'
+    return '%I:%M %p'

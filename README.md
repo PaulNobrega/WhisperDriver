@@ -6,7 +6,7 @@ WhisperDriver is a comprehensive Python library for automating and managing Whis
 - **API and Web Automation**: Use the official WhisperTrades API for fast, reliable access, and Selenium automation for advanced features (e.g., UI-only settings, Schwab broker renewal).
 - **API and Web Credentials**: Uses API token, WhisperTrades credentials, and Schwab credentials for different functions beyond the scope of WT API alone.
 - **Bot Management**: Enable, disable, update, and schedule bots programmatically.
-- **Throttle Management**: Automatically throttle API calls to stay under rate limits.
+- **Throttle Management**: Optional throttle lets you set a minimum delay between API requests to help avoid rate limits. Throttle is enabled by default, but you can disable or adjust the delay as needed.
 - **Scheduler**: Built-in scheduler for timed bot actions (see `example.py`).
 - **Built-in Automatic Schwab Broker Renewal Function**: Seamlessly renew Schwab connections using your proivided Schwab credentials.  Requires App Authenticator 2FA enabled on Schwab account.  First-time in-app confirmation required
 
@@ -67,7 +67,19 @@ WD.scheduler.stop_scheduler_at_time('4:30 PM', 'America/New_York')
 
 ### Throttle
 - **`WD.throttle.set_limit(calls_per_minute)`**: Set API call rate limit.
-- **`WD.throttle.get_status()`**: Get current throttle status.
+- **`WD.throttle.set_delay(seconds)`**: Set the minimum delay (in seconds) between API requests.
+- **`WD.throttle.enable()` / `WD.throttle.disable()`**: Enable or disable the throttle.
+- **`WD.throttle.get_status()`**: Get current throttle status (enabled/disabled, current delay).
+
+#### Example: Throttle Usage
+```python
+# Set a 2-second delay between API requests
+WD.throttle.set_delay(2)
+# Disable throttle if you want maximum speed (not recommended for production)
+WD.throttle.disable()
+# Enable throttle again
+WD.throttle.enable()
+```
 
 ### Scheduler
 - **`WD.scheduler.add_task(time_str, tz, fxn)`**: Schedule any function to run at a specific time and timezone.
