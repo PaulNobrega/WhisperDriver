@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1c417ed5-79fd-480e-beda-39f3f7c0859e" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ProjectId" id="2IMXq1YNHkvUuiZslG6RdSDGqnb" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="WT_auto_on_off_bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Deployed_WhisperDriver" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/WT_auto_on_off_bot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.WT_auto_on_off_bot" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1c417ed5-79fd-480e-beda-39f3f7c0859e" name="Default Changelist" comment="" />
+      <created>1669992612705</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1669992612705</updated>
+      <workItem from="1669992616013" duration="582000" />
+      <workItem from="1670878642860" duration="51000" />
+      <workItem from="1670878768459" duration="1437000" />
+      <workItem from="1670942773934" duration="1071000" />
+      <workItem from="1671915899178" duration="2553000" />
+      <workItem from="1673553221865" duration="1459000" />
+      <workItem from="1673557502585" duration="19000" />
+      <workItem from="1677344415240" duration="2405000" />
+      <workItem from="1678903742626" duration="4957000" />
+      <workItem from="1678916185264" duration="56000" />
+      <workItem from="1678916273798" duration="1445000" />
+      <workItem from="1678917906913" duration="635000" />
+      <workItem from="1679057209787" duration="948000" />
+      <workItem from="1682082687173" duration="3021000" />
+      <workItem from="1687822614349" duration="90000" />
+      <workItem from="1689858822536" duration="1553000" />
+      <workItem from="1692745517964" duration="5000" />
+      <workItem from="1692925683447" duration="45000" />
+      <workItem from="1694723600016" duration="2000" />
+      <workItem from="1701025570026" duration="858000" />
+      <workItem from="1701029217136" duration="193000" />
+      <workItem from="1701215410568" duration="16000" />
+      <workItem from="1701476173778" duration="13000" />
+      <workItem from="1725889984996" duration="36000" />
+      <workItem from="1726346153171" duration="146000" />
+      <workItem from="1732624291652" duration="4000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="3103" y="441" key="FileChooserDialogImpl" timestamp="1687822685704">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state x="3103" y="441" key="FileChooserDialogImpl/0.0.5120.1392@0.0.5120.1392" timestamp="1687822685704" />
+    <state width="2324" height="485" key="GridCell.Tab.0.bottom" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.0.bottom/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.0.center" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.0.center/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.0.left" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.0.left/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.0.right" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.0.right/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.1.bottom" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.1.bottom/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.1.center" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.1.center/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.1.left" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.1.left/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+    <state width="2324" height="485" key="GridCell.Tab.1.right" timestamp="1692925729096">
+      <screen x="0" y="0" width="5120" height="1392" />
+    </state>
+    <state width="2324" height="485" key="GridCell.Tab.1.right/0.0.5120.1392@0.0.5120.1392" timestamp="1692925729096" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Deployed_WhisperDriver$WT_auto_on_off_bot.coverage" NAME="WT_auto_on_off_bot Coverage Results" MODIFIED="1692925693730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
