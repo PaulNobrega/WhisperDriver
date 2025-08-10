@@ -358,9 +358,7 @@ class SeleniumDriver:
             :rtype: dict
             """
 
-            wt_entry_edit_url = f'https://whispertrades.com/bots/{bot_num}/entry/edit'
-            self.__get_url_and_wait(wt_entry_edit_url)
-
+            # Helper functions must be defined before use
             def safe_find_value(by, value, attr='value', default=None):
                 try:
                     el = self.webdriver.find_element(by=by, value=value)
@@ -382,27 +380,57 @@ class SeleniumDriver:
                 except Exception:
                     return default
 
-            # Main fields
+            wt_entry_edit_url = f'https://whispertrades.com/bots/{bot_num}/entry/edit'
+            self.__get_url_and_wait(wt_entry_edit_url)
+
+            # --- Allocation Section ---
             settings = {}
             # Frequency (dropdown)
             settings['frequency'] = safe_find_select(By.ID, 'data.frequency')
-            # Allocation
-            settings['contract_num'] = safe_find_value(By.ID, 'data.allocation_quantity')
+            # Allocation Type (dropdown)
             settings['allocation_type'] = safe_find_select(By.ID, 'data.allocation_type')
+            # Contract Quantity (number input)
+            settings['allocation_quantity'] = safe_find_value(By.ID, 'data.allocation_quantity')
+            # Maximum Concurrent Positions (dropdown)
+            settings['maximum_concurrent_positions'] = safe_find_select(By.ID, 'data.maximum_concurrent_positions')
+            # Allocation Percent (hidden unless allocation_type == 'Percent of Portfolio')
             settings['allocation_percent'] = safe_find_value(By.ID, 'data.allocation_percent')
+            # Allocation Dollars (hidden unless allocation_type == 'Leverage Amount')
             settings['allocation_dollars'] = safe_find_value(By.ID, 'data.allocation_dollars')
+            # Allocation Leverage (hidden unless allocation_type == 'Leverage Amount')
+            settings['allocation_leverage'] = safe_find_value(By.ID, 'data.allocation_leverage')
+            # --- Miscellaneous Section ---
+            # Entry Speed (dropdown)
+            settings['entry_speed'] = safe_find_select(By.ID, 'data.entry_speed')
+            # Move Strike Selection With Conflict (toggle)
+            settings['move_strike_selection_with_conflict'] = safe_find_checkbox(By.ID, 'data.move_strike_selection_with_conflict')
+
+            # --- Strike Selection Section ---
             # DTEs
             settings['min_dte'] = safe_find_value(By.ID, 'data.minimum_days_to_expiration')
             settings['target_dte'] = safe_find_value(By.ID, 'data.target_days_to_expiration')
             settings['max_dte'] = safe_find_value(By.ID, 'data.maximum_days_to_expiration')
-            # Delta/Strike selection
-            settings['min_delta'] = safe_find_value(By.ID, 'data.put_short_strike_delta_minimum')
-            settings['target_delta'] = safe_find_value(By.ID, 'data.put_short_strike_delta')
-            settings['max_delta'] = safe_find_value(By.ID, 'data.put_short_strike_delta_maximum')
+
+            # Put Short Strike Target Type (dropdown)
+            settings['put_short_strike_target_type'] = safe_find_select(By.ID, 'data.put_short_strike_target_type')
+            # Put Short Strike Delta fields
+            settings['put_short_strike_delta_minimum'] = safe_find_value(By.ID, 'data.put_short_strike_delta_minimum')
+            settings['put_short_strike_delta'] = safe_find_value(By.ID, 'data.put_short_strike_delta')
+            settings['put_short_strike_delta_maximum'] = safe_find_value(By.ID, 'data.put_short_strike_delta_maximum')
+            # Put Spread Target Type (dropdown)
+            settings['put_spread_strike_target_type'] = safe_find_select(By.ID, 'data.put_spread_strike_target_type')
+            # Put Spread Target Premium
+            settings['put_spread_strike_target_price'] = safe_find_value(By.ID, 'data.put_spread_strike_target_price')
+            # Put Spread Min/Max Width
+            settings['put_spread_minimum_width'] = safe_find_value(By.ID, 'data.put_spread_minimum_width')
+            settings['put_spread_maximum_width'] = safe_find_value(By.ID, 'data.put_spread_maximum_width')
+            # Restrict Spread Width By (dropdown)
+            settings['restrict_put_spread_width_by'] = safe_find_select(By.ID, 'data.restrict_put_spread_width_by')
+
+            # (Retain call fields for call bots, if present)
             settings['call_min_delta'] = safe_find_value(By.ID, 'data.call_short_strike_delta_minimum')
             settings['call_target_delta'] = safe_find_value(By.ID, 'data.call_short_strike_delta')
             settings['call_max_delta'] = safe_find_value(By.ID, 'data.call_short_strike_delta_maximum')
-            # Spread width and premium
             settings['long_strike_target_premium'] = safe_find_value(By.ID, 'data.put_spread_strike_target_price') or safe_find_value(By.ID, 'data.call_spread_strike_target_price')
             settings['long_strike_points_minimum_width'] = safe_find_value(By.ID, 'data.put_spread_minimum_width') or safe_find_value(By.ID, 'data.call_spread_minimum_width')
             settings['long_strike_points_maximum_width'] = safe_find_value(By.ID, 'data.put_spread_maximum_width') or safe_find_value(By.ID, 'data.call_spread_maximum_width')
@@ -458,30 +486,35 @@ class SeleniumDriver:
             settings['only_hard_to_borrow'] = safe_find_checkbox(By.ID, 'data.only_hard_to_borrow')
             # Custom filters (if present)
             settings['custom_filter'] = safe_find_value(By.ID, 'data.custom_filter')
-            # Entry time window (dropdowns)
+
+            # Entry time window (dropdowns) -- updated to match actual HTML
             try:
                 from selenium.webdriver.support.ui import Select
-                entry_time_start_el = self.webdriver.find_element(By.ID, 'data.entry_time_start')
-                entry_time_end_el = self.webdriver.find_element(By.ID, 'data.entry_time_end')
-                entry_time_start = Select(entry_time_start_el).first_selected_option.text.strip()
-                entry_time_end = Select(entry_time_end_el).first_selected_option.text.strip()
-                settings['entry_time_start'] = entry_time_start if entry_time_start else None
-                settings['entry_time_end'] = entry_time_end if entry_time_end else None
+                earliest_entry_el = self.webdriver.find_element(By.ID, 'data.earliest_entry_time')
+                latest_entry_el = self.webdriver.find_element(By.ID, 'data.latest_entry_time')
+                earliest_entry = Select(earliest_entry_el).first_selected_option.text.strip()
+                latest_entry = Select(latest_entry_el).first_selected_option.text.strip()
+                settings['earliest_entry_time'] = earliest_entry if earliest_entry else None
+                settings['latest_entry_time'] = latest_entry if latest_entry else None
             except Exception:
-                settings['entry_time_start'] = None
-                settings['entry_time_end'] = None
+                settings['earliest_entry_time'] = None
+                settings['latest_entry_time'] = None
 
-            # Entry days of week (checkboxes)
+            # Entry days of week (checkboxes) -- updated to match actual HTML
             days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
             checked_days = []
-            for day in days:
-                try:
-                    el = self.webdriver.find_element(By.ID, f'data.entry_days_of_week.{day}')
-                    if el.is_selected():
-                        checked_days.append(day)
-                except Exception:
-                    continue
-            settings['entry_days_of_week'] = checked_days if checked_days else None
+            try:
+                els = self.webdriver.find_elements(By.CSS_SELECTOR, "input[type='checkbox'][wire\\:model='data.days_of_week']")
+                if not els:
+                    print('[DEBUG] No checkboxes found for days_of_week')
+                for el in els:
+                    val = el.get_attribute('value')
+                    if val in days and el.is_selected():
+                        checked_days.append(val)
+            except Exception as e:
+                print(f'[DEBUG] Exception in days_of_week scraping: {e}')
+            # Always return a list, never None
+            settings['days_of_week'] = checked_days
 
             # Return the full settings dict
             return settings
@@ -517,21 +550,40 @@ class SeleniumDriver:
                         el.click()
                 elif input_type == 'select':
                     from selenium.webdriver.support.ui import Select
-                    Select(el).select_by_value(str(value))
+                    sel = Select(el)
+                    try:
+                        sel.select_by_value(str(value))
+                    except Exception:
+                        # Fallback: try to match by visible text
+                        found = False
+                        for option in sel.options:
+                            if option.text.strip() == str(value).strip():
+                                option.click()
+                                found = True
+                                break
+                        if not found:
+                            print(f"[DEBUG] Could not set select field {field_id} to value '{value}' by value or text.")
                 else:
                     el.clear()
                     if value is not None:
                         el.send_keys(str(value))
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[DEBUG] Exception in safe_update_field for {field_id}: {e}")
 
         # Update all fields present in settings
         field_map = {
+            # --- Allocation Section ---
             'frequency': ('data.frequency', 'select'),
-            'contract_num': ('data.allocation_quantity', 'text'),
             'allocation_type': ('data.allocation_type', 'select'),
+            'allocation_quantity': ('data.allocation_quantity', 'text'),
+            'maximum_concurrent_positions': ('data.maximum_concurrent_positions', 'select'),
             'allocation_percent': ('data.allocation_percent', 'text'),
             'allocation_dollars': ('data.allocation_dollars', 'text'),
+            'allocation_leverage': ('data.allocation_leverage', 'text'),
+            # --- Miscellaneous Section ---
+            'entry_speed': ('data.entry_speed', 'select'),
+            'move_strike_selection_with_conflict': ('data.move_strike_selection_with_conflict', 'checkbox'),
+            # --- Strike Selection Section ---
             'min_dte': ('data.minimum_days_to_expiration', 'text'),
             'target_dte': ('data.target_days_to_expiration', 'text'),
             'max_dte': ('data.maximum_days_to_expiration', 'text'),
@@ -544,6 +596,7 @@ class SeleniumDriver:
             'long_strike_target_premium': ('data.put_spread_strike_target_price', 'text'),
             'long_strike_points_minimum_width': ('data.put_spread_minimum_width', 'text'),
             'long_strike_points_maximum_width': ('data.put_spread_maximum_width', 'text'),
+            # --- Filters, toggles, etc. ---
             'minimum_percent_move_from_close': ('data.minimum_underlying_percent_move_from_close', 'text'),
             'maximum_percent_move_from_close': ('data.maximum_underlying_percent_move_from_close', 'text'),
             'min_underlying_price': ('data.minimum_underlying_price', 'text'),
@@ -580,6 +633,45 @@ class SeleniumDriver:
         for k, v in settings.items():
             if k in field_map and v is not None:
                 safe_update_field(field_map[k][0], v, field_map[k][1])
+
+        # --- Days of week (checkboxes) robust update ---
+        if 'days_of_week' in settings and settings['days_of_week'] is not None:
+            try:
+                days = settings['days_of_week']
+                els = self.webdriver.find_elements(By.CSS_SELECTOR, "input[type='checkbox'][wire\\:model='data.days_of_week']")
+                if not els:
+                    print('[DEBUG] No checkboxes found for days_of_week when updating.')
+                for el in els:
+                    val = el.get_attribute('value')
+                    should_be_checked = val in days
+                    if el.is_selected() != should_be_checked:
+                        el.click()
+            except Exception as e:
+                print(f'[DEBUG] Exception in updating days_of_week: {e}')
+
+        # --- Earliest/Latest Entry Time dropdowns robust update ---
+        from selenium.webdriver.support.ui import Select
+        for time_field, dom_id in [('earliest_entry_time', 'data.earliest_entry_time'), ('latest_entry_time', 'data.latest_entry_time')]:
+            if time_field in settings and settings[time_field] is not None:
+                try:
+                    el = self.webdriver.find_element(By.ID, dom_id)
+                    sel = Select(el)
+                    value_set = False
+                    # Try by value
+                    try:
+                        sel.select_by_value(str(settings[time_field]))
+                        value_set = True
+                    except Exception:
+                        # Fallback: try by visible text
+                        for option in sel.options:
+                            if option.text.strip() == str(settings[time_field]).strip():
+                                option.click()
+                                value_set = True
+                                break
+                    if not value_set:
+                        print(f"[DEBUG] Could not set {time_field} to {settings[time_field]}")
+                except Exception as e:
+                    print(f"[DEBUG] Exception updating {time_field}: {e}")
 
         save_btn.click()
         time.sleep(1)
@@ -625,33 +717,23 @@ class SeleniumDriver:
                 except Exception:
                     return default
 
+            # --- Profit (Standing) Section ---
             settings = {}
-            # Standing profit targets
-            settings['percent_profit_target'] = safe_find_value(By.ID, 'data.profit_target_percent')
+            # Profit Target % (number input)
+            settings['profit_target_percent'] = safe_find_value(By.ID, 'data.profit_target_percent')
+            # Premium <= (number input)
             settings['premium_profit_less_than_or_equal_to'] = safe_find_value(By.ID, 'data.premium_value_profit')
-            # Monitored stops
+
+            # --- Monitored Stops Section ---
             settings['stop_loss_percent'] = safe_find_value(By.ID, 'data.stop_loss_percent')
-            settings['loss_premium_greater_than_or_equal_to'] = safe_find_value(By.ID, 'data.premium_value_loss')
-            settings['loss_delta_greater_than_or_equal_to'] = safe_find_value(By.ID, 'data.delta_value')
-            settings['loss_percent_itm'] = safe_find_value(By.ID, 'data.itm_percent')
-            settings['loss_percent_otm'] = safe_find_value(By.ID, 'data.otm_percent')
+            settings['premium_value_loss'] = safe_find_value(By.ID, 'data.premium_value_loss')
+            settings['itm_percent'] = safe_find_value(By.ID, 'data.itm_percent')
+            settings['otm_percent'] = safe_find_value(By.ID, 'data.otm_percent')
+            settings['delta_value'] = safe_find_value(By.ID, 'data.delta_value')
             settings['monitored_stop_sensitivity'] = safe_find_select(By.ID, 'data.monitored_stop_sensitivity')
-            # Trailing stops (profit % and premium value)
-            settings['trail_trigger_percent'] = safe_find_value(By.ID, 'data.trail_profit_target_percent_trigger')
-            settings['trail_percent'] = safe_find_value(By.ID, 'data.trail_profit_target_percent_amount')
-            settings['trail_trigger_premium'] = safe_find_value(By.ID, 'data.trail_premium_value_profit_trigger')
-            settings['trail_premium'] = safe_find_value(By.ID, 'data.trail_premium_value_profit_amount')
-            settings['trailing_stop_sensitivity'] = safe_find_select(By.ID, 'data.trailing_stop_sensitivity')
-            # Exit speed
-            settings['exit_speed'] = safe_find_select(By.ID, 'data.exit_speed')
-            # Close short strike only
-            settings['close_short_strike_only'] = safe_find_checkbox(By.ID, 'data.close_short_strike_only')
-            # Advanced: MA crossover and value toggles
-            settings['exit_ma_crossover_toggle'] = safe_find_checkbox(By.ID, 'data.exit_ma_crossover_toggle')
-            settings['exit_ma_value_toggle'] = safe_find_checkbox(By.ID, 'data.exit_ma_value_toggle')
-            # Advanced: exit variables (repeater, if present)
+
+            # Variables (Advanced) - exitVariables repeater
             try:
-                # Try to find all exitVariables fields (if present, as a repeater)
                 exit_vars = []
                 idx = 0
                 while True:
@@ -664,6 +746,23 @@ class SeleniumDriver:
                 settings['exit_variables'] = exit_vars
             except Exception:
                 settings['exit_variables'] = []
+
+            # --- Trailing Stops Section ---
+            # Profit %
+            settings['trail_profit_target_percent_trigger'] = safe_find_value(By.ID, 'data.trail_profit_target_percent_trigger')
+            settings['trail_profit_target_percent_amount'] = safe_find_value(By.ID, 'data.trail_profit_target_percent_amount')
+            # Premium Value
+            settings['trail_premium_value_profit_trigger'] = safe_find_value(By.ID, 'data.trail_premium_value_profit_trigger')
+            settings['trail_premium_value_profit_amount'] = safe_find_value(By.ID, 'data.trail_premium_value_profit_amount')
+            # Misc
+            settings['trailing_stop_sensitivity'] = safe_find_select(By.ID, 'data.trailing_stop_sensitivity')
+
+            # --- Remaining fields (already present) ---
+            settings['exit_speed'] = safe_find_select(By.ID, 'data.exit_speed')
+            settings['close_short_strike_only'] = safe_find_checkbox(By.ID, 'data.close_short_strike_only')
+            settings['exit_ma_crossover_toggle'] = safe_find_checkbox(By.ID, 'data.exit_ma_crossover_toggle')
+            settings['exit_ma_value_toggle'] = safe_find_checkbox(By.ID, 'data.exit_ma_value_toggle')
+
             return settings
 
     def update_exit_settings(self, bot_num: str, exit_settings_dict: dict) -> dict:
@@ -671,7 +770,7 @@ class SeleniumDriver:
         Change WT Bot Exit Settings of specified bot number using dictionary of values
         
         :param bot_num: WhisperTrades bot Number
-        :param entry_settings_dict: Dictionary with the same format as returned by function 'get_entry_settings'
+        :param exit_settings_dict: Dictionary with the same format as returned by function 'get_exit_settings'
         :return: Dictionary of changed settings
         :rtype: dict
         """
@@ -704,22 +803,29 @@ class SeleniumDriver:
             except Exception:
                 pass
 
+
+        # Updated field map to match get_exit_settings keys and UI IDs
         field_map = {
-            'percent_profit_target': ('data.profit_target_percent', 'text'),
+            # --- Profit (Standing) Section ---
+            'profit_target_percent': ('data.profit_target_percent', 'text'),
             'premium_profit_less_than_or_equal_to': ('data.premium_value_profit', 'text'),
+            # --- Monitored Stops Section ---
             'stop_loss_percent': ('data.stop_loss_percent', 'text'),
-            'loss_premium_greater_than_or_equal_to': ('data.premium_value_loss', 'text'),
-            'loss_delta_greater_than_or_equal_to': ('data.delta_value', 'text'),
-            'loss_percent_itm': ('data.itm_percent', 'text'),
-            'loss_percent_otm': ('data.otm_percent', 'text'),
+            'premium_value_loss': ('data.premium_value_loss', 'text'),
+            'itm_percent': ('data.itm_percent', 'text'),
+            'otm_percent': ('data.otm_percent', 'text'),
+            'delta_value': ('data.delta_value', 'text'),
             'monitored_stop_sensitivity': ('data.monitored_stop_sensitivity', 'select'),
-            'trail_trigger_percent': ('data.trail_profit_target_percent_trigger', 'text'),
-            'trail_percent': ('data.trail_profit_target_percent_amount', 'text'),
-            'trail_trigger_premium': ('data.trail_premium_value_profit_trigger', 'text'),
-            'trail_premium': ('data.trail_premium_value_profit_amount', 'text'),
+            # --- Trailing Stops Section ---
+            'trail_profit_target_percent_trigger': ('data.trail_profit_target_percent_trigger', 'text'),
+            'trail_profit_target_percent_amount': ('data.trail_profit_target_percent_amount', 'text'),
+            'trail_premium_value_profit_trigger': ('data.trail_premium_value_profit_trigger', 'text'),
+            'trail_premium_value_profit_amount': ('data.trail_premium_value_profit_amount', 'text'),
             'trailing_stop_sensitivity': ('data.trailing_stop_sensitivity', 'select'),
+            # --- Miscellaneous Section ---
             'exit_speed': ('data.exit_speed', 'select'),
             'close_short_strike_only': ('data.close_short_strike_only', 'checkbox'),
+            # --- Market Conditions Section ---
             'exit_ma_crossover_toggle': ('data.exit_ma_crossover_toggle', 'checkbox'),
             'exit_ma_value_toggle': ('data.exit_ma_value_toggle', 'checkbox'),
             # exit_variables is a repeater, not handled here
