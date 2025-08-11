@@ -115,24 +115,6 @@ class WhisperTradesBots(object):
 
 
         class bot_obj(object):
-            def get_positions(self, position_number: str = '', status: str = '', from_date: str = '', to_date: str = '', page: str = ''):
-                """
-                Get all positions for this bot, or a single position if position_number is provided.
-                """
-                return self._endpts.bots.get_bot_positions(
-                    bot_number=self.number,
-                    position_number=position_number,
-                    status=status,
-                    from_date=from_date,
-                    to_date=to_date,
-                    page=page
-                )
-
-            def close_position_by_number(self, position_number: str):
-                """
-                Close a specific position by position number for this bot.
-                """
-                return self._endpts.bots.close_bot_position(position_number)
             
             def __init__(self, bot_dict, scheduler):
                 self.number = ''
@@ -155,9 +137,38 @@ class WhisperTradesBots(object):
                 self._scheduler = scheduler
                 self._endpts = self._scheduler._endpts
                 self.__bot_dict_to_attr(bot_dict)
-                self.enable = self._change_status('enable', self.number, self._endpts, self._scheduler)
-                self.disable = self._change_status('disable', self.number, self._endpts, self._scheduler)
+            
+            def enable(self):
+                """
+                Enable the bot.
+                """
+                return self._change_status('enable', self.number, self._endpts, self._scheduler)
 
+            def disable(self):
+                """
+                Disable the bot.
+                """
+                return self._change_status('disable', self.number, self._endpts, self._scheduler)
+
+            def get_positions(self, position_number: str = '', status: str = '', from_date: str = '', to_date: str = '', page: str = ''):
+                """
+                Get all positions for this bot, or a single position if position_number is provided.
+                """
+                return self._endpts.bots.get_bot_positions(
+                    bot_number=self.number,
+                    position_number=position_number,
+                    status=status,
+                    from_date=from_date,
+                    to_date=to_date,
+                    page=page
+                )
+
+            def close_position_by_number(self, position_number: str):
+                """
+                Close a specific position by position number for this bot.
+                """
+                return self._endpts.bots.close_bot_position(position_number)
+            
             def get_orders(self):
                 """
                 Get all orders for this bot using the API endpoint.
