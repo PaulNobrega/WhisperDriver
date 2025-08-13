@@ -186,8 +186,10 @@ WD.via_selenium.enabled_to_soft_disabled_by_list(['123456', '654321'])
     - `.adjustments` — List of adjustment conditions
     - `.notifications` — List of notifications
     - `.variables` — List of bot variables
-    - `.enable()` — Enable bot
-    - `.disable()` — Disable bot
+    - `.enable()` — Enable bot immediately
+    - `.disable()` — Disable bot immediately
+    - `.enable_at_time(time_str, tz_str='America/New_York')` — Schedule this bot to be enabled at a specific time and timezone
+    - `.disable_at_time(time_str, tz_str='America/New_York')` — Schedule this bot to be disabled at a specific time and timezone
     - `.get_positions(position_number='', status='', from_date='', to_date='', page='')` — Get all positions for this bot, or use filter arguments
     - `.close_position_by_number(position_number)` — Close position by number
     - `.get_orders()` — Get all orders for bot
@@ -208,9 +210,14 @@ print(bot.name, bot.status)
 # Get enabled bots
 enabled_bots = WD.bots.bots_list.is_enabled()
 
-# Enable/disable a bot
+
+# Enable/disable a bot immediately
 bot.enable()
 bot.disable()
+
+# Schedule enable/disable for a bot at a specific time
+bot.enable_at_time('09:25 AM', 'America/New_York')
+bot.disable_at_time('04:05 PM', 'America/New_York')
 
 # Get positions, orders, and variables
 positions = bot.get_positions()

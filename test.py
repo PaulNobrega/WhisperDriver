@@ -8,10 +8,7 @@ from WhisperDriver.Obj.throttle import WhisperTradesThrottle
 # Global WD instance and enable via_selenium
 WD = WhisperDriver.ApiWrapper(personal.WT_API_TOKEN)
 WD.via_selenium.enable(personal.USER, personal.PWD, is_verbose=True, is_headless=True)
-#active_bots = ['bot_num', 'bot_num_2']
-active_bots = ['WFNVC6MY4G']
-
-
+active_bots = ['bot_num', 'bot_num_2']
 
 def test_throttle_demo():
     """

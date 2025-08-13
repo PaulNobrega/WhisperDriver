@@ -140,15 +140,29 @@ class WhisperTradesBots(object):
             
             def enable(self):
                 """
-                Enable the bot.
+                Enable the bot immediately.
                 """
-                return self._change_status('enable', self.number, self._endpts, self._scheduler)
+                return self._change_status('enable', self.number, self._endpts, self._scheduler)()
 
             def disable(self):
                 """
-                Disable the bot.
+                Disable the bot immediately.
                 """
-                return self._change_status('disable', self.number, self._endpts, self._scheduler)
+                return self._change_status('disable', self.number, self._endpts, self._scheduler)()
+            
+            def enable_at_time(self, time_str, tz_str='America/New_York'):
+                """
+                Schedule this bot to be enabled at a specific time and timezone.
+                """
+                self._scheduler.add_task(time_str, tz_str, lambda: self.enable())
+                return
+
+            def disable_at_time(self, time_str, tz_str='America/New_York'):
+                """
+                Schedule this bot to be disabled at a specific time and timezone.
+                """
+                self._scheduler.add_task(time_str, tz_str, lambda: self.disable())
+                return
 
             def get_positions(self, position_number: str = '', status: str = '', from_date: str = '', to_date: str = '', page: str = ''):
                 """
