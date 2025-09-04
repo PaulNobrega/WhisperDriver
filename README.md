@@ -1,22 +1,3 @@
-## Entry Filter Fields (Selenium UI Automation)
-
-The following entry filter fields are available for automation and scraping via Selenium (see `SeleniumDriver.get_entry_settings` and `update_entry_settings`). These correspond to the UI fields in the WhisperTrades bot entry form:
-
-| Field Name                                 | Description                                      |
-|--------------------------------------------|--------------------------------------------------|
-| minimum_starting_premium                   | Minimum premium for entry                        |
-| maximum_starting_premium                   | Maximum premium for entry                        |
-| minimum_iv                                 | Minimum IV                                       |
-| maximum_iv                                 | Maximum IV                                       |
-| minimum_vix                                | Minimum VIX                                      |
-| maximum_vix                                | Maximum VIX                                      |
-| minimum_underlying_percent_move_from_close | Minimum % move from previous close               |
-| maximum_underlying_percent_move_from_close | Maximum % move from previous close               |
-| minimum_underlying_percent_move_from_open  | Minimum % move from open                         |
-| maximum_underlying_percent_move_from_open  | Maximum % move from open                         |
-| ...                                        | (Many more, see via_ui.py for full list)         |
-
-All these fields can be read and set using the SeleniumDriver's entry settings methods. For the full, up-to-date list, see the `field_map` in `via_ui.py`.
 # WhisperDriver
 
 WhisperDriver is a comprehensive Python library for automating and managing [WhisperTrades.com](https://whispertrades.com/) bots, variables, and broker connections. It combines robust API access with advanced Selenium-based web automation, enabling features not available through the API alone. The library is designed with a focus on reliability, scheduling, and rate-limit consciousness.
@@ -216,6 +197,139 @@ WD.via_selenium.enabled_to_soft_disabled_by_list(['123456', '654321'])
     - `.close_position()` — Close all bot’s open positions
     - `.update()` — Update bot information from WhisperTrades API
     - `.get_bot_variables()` — Update bot variable information from WhisperTrades API
+
+## Entry Filter Fields (Selenium UI Automation)
+
+The following entry filter fields are available for automation and scraping via Selenium (see `SeleniumDriver.get_entry_settings` and `update_entry_settings`). These correspond to the UI fields in the WhisperTrades bot entry form. All fields below can be read and set using the SeleniumDriver's entry settings methods.
+
+| Field Name | Description |
+|---|---|
+| frequency | Entry frequency (e.g., Daily, Weekly) |
+| maximum_entries_per_day | Maximum entries per day |
+| maximum_concurrent_positions | Maximum concurrent positions |
+| day_of_week | Day(s) of week to allow entry |
+| allocation_type | Allocation type (e.g., contracts, percent) |
+| contract_quantity | Number of contracts to allocate |
+| leverage_amount | Leverage amount |
+| percent_of_portfolio | Percent of portfolio to allocate |
+| minimum_days_to_expiration | Minimum days to expiration |
+| target_days_to_expiration | Target days to expiration |
+| maximum_days_to_expiration | Maximum days to expiration |
+| put_short_strike_type | Put short strike target type |
+| put_short_strike_minimum_delta | Put short strike minimum delta |
+| put_short_strike_target_delta | Put short strike target delta |
+| put_short_strike_maximum_delta | Put short strike maximum delta |
+| put_short_strike_minimum_premium | Put short strike minimum premium |
+| put_short_strike_target_premium | Put short strike target premium |
+| put_short_strike_maximum_premium | Put short strike maximum premium |
+| put_short_strike_percent_otm_minimum | Put short strike minimum % OTM |
+| put_short_strike_target_percent_otm | Put short strike target % OTM |
+| put_short_strike_percent_otm_maximum | Put short strike maximum % OTM |
+| put_long_strike_type | Put long strike target type |
+| put_long_strike_target_delta | Put long strike target delta |
+| restrict_put_spread_width_by | Restrict put spread width by (points/percent) |
+| put_spread_minimum_width_points | Put spread minimum width (points) |
+| put_spread_maximum_width_points | Put spread maximum width (points) |
+| put_spread_minimum_width_percent | Put spread minimum width (percent) |
+| put_spread_maximum_width_percent | Put spread maximum width (percent) |
+| put_spread_target_width_points | Put spread target width (points) |
+| put_spread_strike_target_premium | Put spread strike target premium |
+| put_spread_target_width_percent | Put spread target width (percent from main strike) |
+| put_spread_smart_width | Use smart width for put spread |
+| call_short_strike_type | Call short strike target type |
+| call_short_strike_minimum_delta | Call short strike minimum delta |
+| call_short_strike_target_delta | Call short strike target delta |
+| call_short_strike_maximum_delta | Call short strike maximum delta |
+| call_short_strike_minimum_premium | Call short strike minimum premium |
+| call_short_strike_target_premium | Call short strike target premium |
+| call_short_strike_maximum_premium | Call short strike maximum premium |
+| call_short_strike_percent_otm_minimum | Call short strike minimum % OTM |
+| call_short_strike_target_percent_otm | Call short strike target % OTM |
+| call_short_strike_percent_otm_maximum | Call short strike maximum % OTM |
+| call_long_strike_type | Call long strike target type |
+| call_long_strike_target_delta | Call long strike target delta |
+| restrict_call_spread_width_by | Restrict call spread width by (points/percent) |
+| call_spread_minimum_width_points | Call spread minimum width (points) |
+| call_spread_maximum_width_points | Call spread maximum width (points) |
+| call_spread_minimum_width_percent | Call spread minimum width (percent) |
+| call_spread_maximum_width_percent | Call spread maximum width (percent) |
+| call_spread_target_width_points | Call spread target width (points) |
+| call_spread_strike_target_premium | Call spread strike target premium |
+| call_spread_target_width_percent | Call spread target width (percent from main strike) |
+| call_spread_smart_width | Use smart width for call spread |
+| minimum_starting_premium | Minimum premium for entry |
+| maximum_starting_premium | Maximum premium for entry |
+| minimum_iv | Minimum IV |
+| maximum_iv | Maximum IV |
+| minimum_vix | Minimum VIX |
+| maximum_vix | Maximum VIX |
+| minimum_underlying_percent_move_from_close | Minimum % move from previous close |
+| maximum_underlying_percent_move_from_close | Maximum % move from previous close |
+| minimum_underlying_percent_move_from_open | Minimum % move from open |
+| maximum_underlying_percent_move_from_open | Maximum % move from open |
+| entry_percent_from_today_high_toggle | Enable percent from today's high filter |
+| minimum_underlying_percent_move_from_today_high | Minimum % move from today's high |
+| maximum_underlying_percent_move_from_today_high | Maximum % move from today's high |
+| underlying_percent_from_today_high_start_time | Start time for today's high filter |
+| underlying_percent_from_today_high_end_time | End time for today's high filter |
+| entry_percent_from_today_low_toggle | Enable percent from today's low filter |
+| minimum_underlying_percent_move_from_today_low | Minimum % move from today's low |
+| maximum_underlying_percent_move_from_today_low | Maximum % move from today's low |
+| underlying_percent_from_today_low_start_time | Start time for today's low filter |
+| underlying_percent_from_today_low_end_time | End time for today's low filter |
+| entry_percent_from_prior_high_toggle | Enable percent from prior high filter |
+| minimum_underlying_percent_move_from_prior_high | Minimum % move from prior high |
+| maximum_underlying_percent_move_from_prior_high | Maximum % move from prior high |
+| underlying_percent_from_prior_high_start_time | Start time for prior high filter |
+| underlying_percent_from_prior_high_end_time | End time for prior high filter |
+| entry_percent_from_prior_low_toggle | Enable percent from prior low filter |
+| minimum_underlying_percent_move_from_prior_low | Minimum % move from prior low |
+| maximum_underlying_percent_move_from_prior_low | Maximum % move from prior low |
+| underlying_percent_from_prior_low_start_time | Start time for prior low filter |
+| underlying_percent_from_prior_low_end_time | End time for prior low filter |
+| entry_ma_crossover_toggle | Enable moving average crossover filter |
+| ma_crossover_one | First moving average for crossover |
+| ma_crossover_percent | Percent for crossover filter |
+| ma_crossover_type | Crossover type (above/below) |
+| ma_crossover_two | Second moving average for crossover |
+| entry_ma_value_toggle | Enable moving average value filter |
+| ma_value_percent | Percent for MA value filter |
+| ma_value_type | MA value type |
+| ma_value_ma | Moving average for value filter |
+| avoid_fomc | Avoid FOMC days |
+| avoid_fomc_days_before | Days before FOMC to avoid |
+| avoid_fomc_days_after | Days after FOMC to avoid |
+| min_underlying_price | Minimum underlying price |
+| max_underlying_price | Maximum underlying price |
+| min_underlying_iv | Minimum underlying IV |
+| max_underlying_iv | Maximum underlying IV |
+| min_underlying_iv_rank | Minimum underlying IV rank |
+| max_underlying_iv_rank | Maximum underlying IV rank |
+| min_underlying_iv_percentile | Minimum underlying IV percentile |
+| max_underlying_iv_percentile | Maximum underlying IV percentile |
+| skip_earnings | Skip earnings dates |
+| exclude_tickers | Exclude these tickers |
+| only_tickers | Only include these tickers |
+| min_underlying_price_change | Minimum underlying price change |
+| max_underlying_price_change | Maximum underlying price change |
+| min_underlying_volume | Minimum underlying volume |
+| min_underlying_open_interest | Minimum underlying open interest |
+| min_underlying_market_cap | Minimum underlying market cap |
+| underlying_sector | Underlying sector filter |
+| underlying_industry | Underlying industry filter |
+| only_etfs | Only include ETFs |
+| only_stocks | Only include stocks |
+| only_index | Only include index products |
+| only_liquid_options | Only include liquid options |
+| only_marginable | Only include marginable securities |
+| only_shortable | Only include shortable securities |
+| only_easy_to_borrow | Only include easy-to-borrow securities |
+| only_hard_to_borrow | Only include hard-to-borrow securities |
+| custom_filter | Custom filter (advanced) |
+| entry_speed | Entry speed (e.g., Fast, Normal) |
+| move_strike_selection_with_conflict | Move strike selection if conflict |
+
+For the full, up-to-date list and technical details, see the `field_map` in `via_ui.py`.
 
 **Usage Examples:**
 ```python
