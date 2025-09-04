@@ -138,6 +138,10 @@ class WhisperTradesBots(object):
                 self._endpts = self._scheduler._endpts
                 self.__bot_dict_to_attr(bot_dict)
             
+            def _meridian_time_to_military_time(self, time_str):
+                from WhisperDriver.utils.time import get_hour_minute_ampm_format
+                return datetime.strptime(time_str, get_hour_minute_ampm_format()).strftime('%H:%M')
+            
             def enable(self):
                 """
                 Enable the bot immediately.
@@ -152,16 +156,38 @@ class WhisperTradesBots(object):
             
             def enable_at_time(self, time_str, tz_str='America/New_York'):
                 """
-                Schedule this bot to be enabled at a specific time and timezone.
+                Schedule bot status change.
+                
+                :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
+                :type time_str: String
+                :param tz_str: human readable TimeZone. Default is 'America/New_York'
+                :type tz_str: String
                 """
-                self._scheduler.add_task(time_str, tz_str, lambda: self.enable())
+                if not time_str or not isinstance(time_str, str):
+                    raise ValueError('Time input string is required!')
+                if 'pm' in time_str.lower() or 'am' in time_str.lower():
+                    time_str = self._meridian_time_to_military_time(time_str)
+                if not self._scheduler.scheduler_is_on:
+                    self._scheduler.start()
+                self._scheduler.add_task(time_str, tz_str, self.enable)
                 return
 
             def disable_at_time(self, time_str, tz_str='America/New_York'):
                 """
-                Schedule this bot to be disabled at a specific time and timezone.
+                Schedule bot status change.
+                
+                :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
+                :type time_str: String
+                :param tz_str: human readable TimeZone. Default is 'America/New_York'
+                :type tz_str: String
                 """
-                self._scheduler.add_task(time_str, tz_str, lambda: self.disable())
+                if not time_str or not isinstance(time_str, str):
+                    raise ValueError('Time input string is required!')
+                if 'pm' in time_str.lower() or 'am' in time_str.lower():
+                    time_str = self._meridian_time_to_military_time(time_str)
+                if not self._scheduler.scheduler_is_on:
+                    self._scheduler.start()
+                self._scheduler.add_task(time_str, tz_str, self.disable)
                 return
 
             def get_positions(self, position_number: str = '', status: str = '', from_date: str = '', to_date: str = '', page: str = ''):
@@ -249,27 +275,6 @@ class WhisperTradesBots(object):
                         return self._endpts.bots.disable_bot(self._bot_number)
                     return
                 
-                def _meridian_time_to_military_time(self, time_str):
-                    from WhisperDriver.utils.time import get_hour_minute_ampm_format
-                    return datetime.strptime(time_str, get_hour_minute_ampm_format()).strftime('%H:%M')
-
-                def at_time(self, time_str=None, tz_str='America/New_York'):
-                    """
-                    Schedule bot status change.
-                    
-                    :param time_str: string representation of military time (example: '22:30'). If 12-hr format, PM or AM must be included in string.
-                    :type time_str: String
-                    :param tz_str: human readable TimeZone. Default is 'America/New_York'
-                    :type tz_str: String
-                    """
-                    if not time_str or not isinstance(time_str, str):
-                        raise ValueError('Time input string is required!')
-                    if 'pm' in time_str.lower() or 'am' in time_str.lower():
-                        time_str = self._meridian_time_to_military_time(time_str)
-                    if not self._scheduler.scheduler_is_on:
-                        self._scheduler.start()
-                    self._scheduler.add_task(time_str, tz_str, self._toggle_status)
-                    return
                     
 
 

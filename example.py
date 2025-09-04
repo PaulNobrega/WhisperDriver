@@ -58,11 +58,11 @@ def run_main():
         enable_time = (earliest_dt - timedelta(minutes=5)).strftime("%I:%M %p")
         disable_time = (latest_dt + timedelta(minutes=5)).strftime("%I:%M %p")
 
-    # Use bot methods to schedule enable/disable
-    bot.enable_at_time(enable_time, 'America/New_York')
-    print(f"Scheduled enable for bot {bot_num} at {enable_time}")
-    bot.disable_at_time(disable_time, 'America/New_York')
-    print(f"Scheduled soft disable for bot {bot_num} at {disable_time}")
+        # Use bot methods to schedule enable/disable
+        bot.enable_at_time(enable_time, 'America/New_York')
+        print(f"Scheduled enable for bot {bot_num} at {enable_time}")
+        bot.disable_at_time(disable_time, 'America/New_York')
+        print(f"Scheduled soft disable for bot {bot_num} at {disable_time}")
 
     # Example scheduling of arbitrary function via partial function application
     def print_message(msg):

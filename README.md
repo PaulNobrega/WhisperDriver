@@ -1,3 +1,22 @@
+## Entry Filter Fields (Selenium UI Automation)
+
+The following entry filter fields are available for automation and scraping via Selenium (see `SeleniumDriver.get_entry_settings` and `update_entry_settings`). These correspond to the UI fields in the WhisperTrades bot entry form:
+
+| Field Name                                 | Description                                      |
+|--------------------------------------------|--------------------------------------------------|
+| minimum_starting_premium                   | Minimum premium for entry                        |
+| maximum_starting_premium                   | Maximum premium for entry                        |
+| minimum_iv                                 | Minimum IV                                       |
+| maximum_iv                                 | Maximum IV                                       |
+| minimum_vix                                | Minimum VIX                                      |
+| maximum_vix                                | Maximum VIX                                      |
+| minimum_underlying_percent_move_from_close | Minimum % move from previous close               |
+| maximum_underlying_percent_move_from_close | Maximum % move from previous close               |
+| minimum_underlying_percent_move_from_open  | Minimum % move from open                         |
+| maximum_underlying_percent_move_from_open  | Maximum % move from open                         |
+| ...                                        | (Many more, see via_ui.py for full list)         |
+
+All these fields can be read and set using the SeleniumDriver's entry settings methods. For the full, up-to-date list, see the `field_map` in `via_ui.py`.
 # WhisperDriver
 
 WhisperDriver is a comprehensive Python library for automating and managing [WhisperTrades.com](https://whispertrades.com/) bots, variables, and broker connections. It combines robust API access with advanced Selenium-based web automation, enabling features not available through the API alone. The library is designed with a focus on reliability, scheduling, and rate-limit consciousness.
