@@ -22,10 +22,19 @@ class WhisperTradesVariables(object):
         self.variables_list = self.__variable_list(self._endpts)
         self.update_all_variables()
     
-    
+    def __call__(self, variable_number: str):
+        """
+        Return the variable object for the provided variable number.
+        Usage: WD.variables('VARIABLE_NUMBER')
+        """
+        for vari in self.variables_list.all:
+            if hasattr(vari, 'number') and vari.number == variable_number:
+                return vari
+        raise KeyError(f"Variable number '{variable_number}' not found.")
+
     def update_all_variables(self):
         """
-        Update variabless_list with data retrieved from WhisperTrades.com API
+        Update variables_list with data retrieved from WhisperTrades.com API
         """
         self.variables_list.all = []
         _ = [self.variables_list.add_variable_to_list(vari) for vari in self._endpts.variables.get_all_bot_variables()]

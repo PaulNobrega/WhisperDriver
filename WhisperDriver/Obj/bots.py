@@ -24,11 +24,14 @@ class WhisperTradesBots(object):
         self.bots_list = self.__bot_list(self._scheduler)
 
     def __call__(self, bot_number):
+        """
+        Return the bot object for the provided bot number.
+        Usage: WD.bots('BOT_NUMBER')
+        """
         for bot in self.bots_list.all:
-            if bot.number == bot_number:
+            if hasattr(bot, 'number') and bot.number == bot_number:
                 return bot
-        warnings.warn(f"Bot Number: {bot_number} not found!")
-        return
+        raise KeyError(f"Bot number '{bot_number}' not found.")
        
     def get_all_bot_variables(self) -> json:
         """
@@ -47,13 +50,15 @@ class WhisperTradesBots(object):
     
     def update_all_bots(self):
         """
-        Update bots_list with data retrieved from WHisperTrades.com API
+        Update bots_list with data retrieved from WhisperTrades.com API
         """
         self.bots_list.all = []
         _ = [self.bots_list.add_bot_to_list(bot) for bot in self._endpts.bots.get_all_bots()]
+        self.bots_list.update_positions_all_bots()
         return
 
     class __bot_list(object):
+
         def __init__(self, scheduler):
             self.all = []
             self._scheduler = scheduler
@@ -112,10 +117,34 @@ class WhisperTradesBots(object):
                     del self.all[i]
                     return
             return
+        
+        def update_positions_all_bots(self):
+            """
+            Fetch all positions for all bots in one API call and update each bot's .positions attribute accordingly.
+            """
+
+            try:
+                all_positions = self._endpts.bots.get_bot_positions()
+                if isinstance(all_positions, dict) and 'data' in all_positions:
+                    all_positions = all_positions['data']
+                # Build a mapping from bot number to list of positions
+                bot_positions_map = {}
+                for pos in all_positions:
+                    bot_info = pos.get('bot') if isinstance(pos, dict) else None
+                    bot_number = bot_info.get('number') if bot_info else None
+                    if bot_number:
+                        bot_positions_map.setdefault(bot_number, []).append(pos)
+                # Assign positions to each bot in the list
+                for bot in self.all:
+                    bot.positions = bot_positions_map.get(bot.number, [])
+            except Exception as e:
+                for bot in self.all:
+                    bot.positions = []
+                print(f"Failed to update positions for all bots: {e}")
 
 
         class bot_obj(object):
-            
+           
             def __init__(self, bot_dict, scheduler):
                 self.number = ''
                 self.name = ''
@@ -134,9 +163,10 @@ class WhisperTradesBots(object):
                 self.adjustments = []
                 self.notifications = []
                 self.variables = []
+                self.positions = []  # List of positions for this bot
                 self._scheduler = scheduler
                 self._endpts = self._scheduler._endpts
-                self.__bot_dict_to_attr(bot_dict)
+                self.__bot_dict_to_attr(bot_dict)                
             
             def _meridian_time_to_military_time(self, time_str):
                 from WhisperDriver.utils.time import get_hour_minute_ampm_format
@@ -238,14 +268,38 @@ class WhisperTradesBots(object):
                 for key in bot_dict: 
                     setattr(self, key, bot_dict[key])
             
+            def _refresh_positions(self):
+                """
+                Query WhisperTrades.com for all positions for this bot and update self.positions,
+                only including positions where the bot number matches this bot.
+                """
+                try:
+                    positions_data = self._endpts.bots.get_bot_positions(bot_number=self.number)
+                    # Extract positions list from API response
+                    if isinstance(positions_data, dict) and 'data' in positions_data:
+                        all_positions = positions_data['data']
+                    else:
+                        all_positions = positions_data
+                    # Filter positions to only those with matching bot number
+                    filtered = []
+                    for pos in all_positions:
+                        bot_info = pos.get('bot') if isinstance(pos, dict) else None
+                        if bot_info and bot_info.get('number') == self.number:
+                            filtered.append(pos)
+                    self.positions = filtered
+                except Exception as e:
+                    self.positions = []
+                    print(f"Failed to fetch positions for bot {self.number}: {e}")
+
             def update(self):
                 """
-                Query WhisperTrades.com for bot information and update object with new information 
+                Query WhisperTrades.com for bot information and update object with new information, including positions
                 """
                 bot_dict = self._endpts.bots.get_bot(bot_number=self.number)
                 self.__bot_dict_to_attr(json.loads(json.dumps(bot_dict)))
+                self._refresh_positions()
                 return
-            
+           
             def get_bot_variables(self):
                 """
                 Query WhisperTrades.com for variables associated with bot and update object with new information 

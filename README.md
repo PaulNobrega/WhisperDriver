@@ -343,7 +343,6 @@ print(bot.name, bot.status)
 # Get enabled bots
 enabled_bots = WD.bots.bots_list.is_enabled()
 
-
 # Enable/disable a bot immediately
 bot.enable()
 bot.disable()
@@ -351,6 +350,10 @@ bot.disable()
 # Schedule enable/disable for a bot at a specific time
 bot.enable_at_time('09:25 AM', 'America/New_York')
 bot.disable_at_time('04:05 PM', 'America/New_York')
+
+# Correct usage for scheduling multiple bots:
+_ = [WD.bots(b).enable_at_time('09:25 AM', 'America/New_York') for b in bot_list]
+_ = [WD.bots(b).disable_at_time('04:05 PM', 'America/New_York') for b in bot_list]
 
 # Get positions, orders, and variables
 positions = bot.get_positions()
