@@ -6,3 +6,4 @@ WT_API_TOKEN = 'Whispertrades.com API token'
 # For Schwab connection renewal only
 Schwab_USER = 'Schwab Username'
 Schwab_PWD = 'Schwab Password'
+
