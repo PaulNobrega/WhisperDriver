@@ -5,7 +5,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="WhisperDriver",
-    version="0.1.7",
+    version="0.1.8",
     description="Automation and API library for WhisperTrades.com",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
